@@ -2,10 +2,13 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 
 const AuthContext = createContext(null);
 
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+
 const API = (path, opts = {}, token) => {
   const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
   if (token) headers['Authorization'] = `Bearer ${token}`;
-  return fetch(path, { ...opts, headers });
+  const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
+  return fetch(url, { ...opts, headers });
 };
 
 export function AuthProvider({ children }) {
@@ -15,7 +18,7 @@ export function AuthProvider({ children }) {
   });
 
   const login = useCallback(async (email, password) => {
-    const res = await fetch('/api/auth/login', {
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -30,7 +33,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const register = useCallback(async (full_name, email, password) => {
-    const res = await fetch('/api/auth/register', {
+    const res = await fetch(`${API_BASE}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ full_name, email, password })
@@ -58,7 +61,8 @@ export function AuthProvider({ children }) {
     if (!(opts.body instanceof FormData) && !headers['Content-Type']) {
       headers['Content-Type'] = 'application/json';
     }
-    return fetch(path, { ...opts, headers });
+    const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
+    return fetch(url, { ...opts, headers });
   }, [token]);
 
   return (
