@@ -11,9 +11,11 @@ dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 dotenv.config();
 
 const { Pool } = pkg;
+const isProduction = process.env.NODE_ENV === 'production' || !!process.env.RENDER;
 
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/careerpilot',
+  ssl: isProduction ? { rejectUnauthorized: false } : false,
 });
 
 pool.on('connect', () => {

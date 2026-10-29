@@ -27,6 +27,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+def root():
+    return {"status": "ok", "service": "Advanced Career Pilot AI Service", "version": "2.0.0"}
+
 # Pydantic Request Models
 class ResumeParseRequest(BaseModel):
     resume_text: str
